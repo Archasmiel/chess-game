@@ -1,7 +1,7 @@
-package engine.entitybase;
+package engine.entity.entitybase;
 
-import engine.basic.Identifiable;
-import engine.basic.Nameable;
+import engine.entity.basic.Identifiable;
+import engine.entity.basic.Nameable;
 
 import java.util.ArrayList;
 import java.util.Arrays;

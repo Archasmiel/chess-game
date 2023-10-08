@@ -1,4 +1,4 @@
-package listener;
+package engine.listener;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
@@ -6,7 +6,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 public class KeyListener {
 
     private static KeyListener INSTANCE;
-    private boolean[] keyPressed = new boolean[350];
+    private final boolean[] keyPressed = new boolean[350];
 
     private KeyListener() {
 

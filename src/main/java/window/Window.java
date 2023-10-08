@@ -1,16 +1,21 @@
 package window;
 
-import lib.ColorTicker;
-import listener.KeyListener;
-import listener.MouseListener;
+import engine.listener.KeyListener;
+import engine.listener.MouseListener;
+import engine.scene.LevelEditScene;
+import engine.scene.LevelScene;
+import engine.scene.Scene;
+import engine.time.SimpleTimer;
+import engine.time.Time;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -50,9 +55,43 @@ public class Window {
     private int height;
     private String title;
     private Long glfwWindow;
+    private int currentScene = -1;
+    private List<Scene> allScenes = new ArrayList<>();
 
     private Window() {
 
+    }
+
+    public void addNewScene() {
+        LevelScene scene = new LevelScene();
+        allScenes.add(scene);
+        allScenes.add(new LevelEditScene(scene));
+    }
+
+    public void scrollScene() {
+        if (currentScene == -1) {
+            addNewScene();
+            currentScene = 0;
+            return;
+        }
+        if (currentScene+1 >= allScenes.size()) {
+            currentScene = 0;
+            return;
+        }
+        currentScene++;
+    }
+
+    public void descrollScene() {
+        if (currentScene == -1) {
+            addNewScene();
+            currentScene = 0;
+            return;
+        }
+        if (currentScene-1 <= 0) {
+            currentScene = allScenes.size() - 1;
+            return;
+        }
+        currentScene--;
     }
 
     public void run() {
@@ -89,30 +128,50 @@ public class Window {
         glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
+
+        scrollScene();
     }
 
     public void loop() {
-        ColorTicker base = new ColorTicker();
+        float beginTime = Time.getTime(), endTime;
+        float dt = -1.0f;
+        SimpleTimer st1 = new SimpleTimer(2f);
+        SimpleTimer st2 = new SimpleTimer(1);
+
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
-            glClearColor(base.getR(), base.getG(), base.getB(), base.getA());
-            glClear(GL_COLOR_BUFFER_BIT);
+            if (dt >= 0) {
+                if (st1.isOpened()) {
+                    if (KeyListener.isKeyPressed(GLFW_KEY_Q)) {
+                        scrollScene();
+                        System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
+                        st1.reset();
+                    }
+                    if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
+                        descrollScene();
+                        System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
+                        st1.reset();
+                    }
+                }
 
-            if (KeyListener.isKeyPressed(GLFW_KEY_Q)) {
-                base.tickRGBA(0);
-            }
-            if (KeyListener.isKeyPressed(GLFW_KEY_W)) {
-                base.tickRGBA(1);
-            }
-            if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
-                base.tickRGBA(2);
-            }
-            if (KeyListener.isKeyPressed(GLFW_KEY_R)) {
-                base.tickRGBA(3);
+                if (KeyListener.isKeyPressed(GLFW_KEY_W) && st2.isOpened()) {
+                    addNewScene();
+                    System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
+                    st2.reset();
+                }
+
+                st1.tick(dt);
+                st2.tick(dt);
+
+                allScenes.get(currentScene).update(dt);
             }
 
             glfwSwapBuffers(glfwWindow);
+
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
 

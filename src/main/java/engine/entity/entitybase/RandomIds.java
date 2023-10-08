@@ -1,4 +1,4 @@
-package engine.entitybase;
+package engine.entity.entitybase;
 
 import java.util.HashSet;
 import java.util.Random;
