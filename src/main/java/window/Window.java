@@ -1,5 +1,6 @@
 package window;
 
+import lib.ColorTicker;
 import listener.KeyListener;
 import listener.MouseListener;
 import org.lwjgl.Version;
@@ -37,7 +38,7 @@ public class Window {
             if (window.width <= 0 || window.height <= 0) {
                 throw new IllegalStateException("Window size(-s) are incorrect");
             }
-            if (window.title == null || window.title.equals("")) {
+            if (window.title == null || window.title.isEmpty()) {
                 throw new IllegalStateException("Window title is empty");
             }
             return window;
@@ -91,28 +92,24 @@ public class Window {
     }
 
     public void loop() {
-        float r = 0, g = 0, b = 0, a = 0;
+        ColorTicker base = new ColorTicker();
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
-            glClearColor(r, g, b, a);
+            glClearColor(base.getR(), base.getG(), base.getB(), base.getA());
             glClear(GL_COLOR_BUFFER_BIT);
 
             if (KeyListener.isKeyPressed(GLFW_KEY_Q)) {
-                r += 0.01f;
-                r %= 1f;
+                base.tickRGBA(0);
             }
             if (KeyListener.isKeyPressed(GLFW_KEY_W)) {
-                g += 0.01f;
-                g %= 1f;
+                base.tickRGBA(1);
             }
             if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
-                b += 0.01f;
-                b %= 1f;
+                base.tickRGBA(2);
             }
             if (KeyListener.isKeyPressed(GLFW_KEY_R)) {
-                a += 0.01f;
-                a %= 1f;
+                base.tickRGBA(3);
             }
 
             glfwSwapBuffers(glfwWindow);
