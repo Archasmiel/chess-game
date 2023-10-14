@@ -1,6 +1,6 @@
-package engine.time;
+package engine.time.timer;
 
-public class SimpleTimer {
+public class SimpleTimer implements ITimer {
 
     private boolean blocked;
     private float time;
@@ -12,26 +12,28 @@ public class SimpleTimer {
         this.maxTime = maxTime;
     }
 
+    @Override
     public void reset() {
         time = maxTime;
         blocked = true;
     }
 
+    @Override
     public void tick(float dt) {
-        if (blocked) {
-            if (time - dt <= 0) {
-                blocked = false;
-            } else {
-                time -= dt;
-            }
+        if (time - dt <= 0) {
+            blocked = false;
+        } else {
+            time -= dt;
         }
     }
 
-    public boolean isBlocked() {
+    @Override
+    public boolean blocked() {
         return blocked;
     }
 
-    public boolean isOpened() {
+    @Override
+    public boolean opened() {
         return !blocked;
     }
 }

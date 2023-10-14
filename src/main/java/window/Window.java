@@ -5,8 +5,10 @@ import engine.listener.MouseListener;
 import engine.scene.LevelEditScene;
 import engine.scene.LevelScene;
 import engine.scene.Scene;
-import engine.time.SimpleTimer;
+import engine.time.timer.ITimer;
+import engine.time.timer.SimpleTimer;
 import engine.time.Time;
+import engine.time.timer.Timers;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -139,42 +141,46 @@ public class Window {
     public void loop() {
         float beginTime = Time.getTime(), endTime;
         float dt = -1.0f;
-        SimpleTimer st1 = new SimpleTimer(2f);
-        SimpleTimer st2 = new SimpleTimer(1);
+        Timers timers = new Timers();
+        timers.add(new SimpleTimer(0.5f));
+        timers.add(new SimpleTimer(0.5f));
 
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
+
+
             if (dt >= 0) {
-                if (st1.isOpened()) {
+                ITimer timer = timers.get(0);
+                if (timer.opened()) {
                     if (KeyListener.isKeyPressed(GLFW_KEY_Q)) {
                         scrollScene();
                         System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
-                        st1.reset();
+                        timer.reset();
                     }
                     if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
                         descrollScene();
                         System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
-                        st1.reset();
+                        timer.reset();
                     }
                 }
 
-                if (KeyListener.isKeyPressed(GLFW_KEY_W) && st2.isOpened()) {
-                    addNewScene();
-                    System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
-                    st2.reset();
+                timer = timers.get(1);
+                if (timer.opened()) {
+                    if (KeyListener.isKeyPressed(GLFW_KEY_W)) {
+                        addNewScene();
+                        System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
+                        timer.reset();
+                    }
                 }
 
                 glClearColor(1f, 1f, 1f, 1f);
                 glClear(GL_COLOR_BUFFER_BIT);
-
-                st1.tick(dt);
-                st2.tick(dt);
-
                 allScenes.get(currentScene).update(dt);
             }
 
             glfwSwapBuffers(glfwWindow);
+            timers.tick(dt);
 
             endTime = Time.getTime();
             dt = endTime - beginTime;
