@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -160,6 +161,9 @@ public class Window {
                     System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
                     st2.reset();
                 }
+
+                glClearColor(1f, 1f, 1f, 1f);
+                glClear(GL_COLOR_BUFFER_BIT);
 
                 st1.tick(dt);
                 st2.tick(dt);

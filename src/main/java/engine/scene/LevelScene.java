@@ -8,7 +8,6 @@ public class LevelScene extends Scene{
 
     @Override
     public void update(float dt) {
-        glClearColor(1f, 0f, 0f, 1f);
-        glClear(GL_COLOR_BUFFER_BIT);
+
     }
 }
