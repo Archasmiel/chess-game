@@ -148,8 +148,6 @@ public class Window {
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
-
-
             if (dt >= 0) {
                 ITimer timer = timers.get(0);
                 if (timer.opened()) {
