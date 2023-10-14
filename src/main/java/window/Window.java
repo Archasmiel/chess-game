@@ -57,7 +57,7 @@ public class Window {
     private String title;
     private Long glfwWindow;
     private int currentScene = -1;
-    private List<Scene> allScenes = new ArrayList<>();
+    private final List<Scene> allScenes = new ArrayList<>();
 
     private Window() {
 
@@ -66,7 +66,10 @@ public class Window {
     public void addNewScene() {
         LevelScene scene = new LevelScene();
         allScenes.add(scene);
-        allScenes.add(new LevelEditScene(scene));
+        LevelEditScene levelEditScene = new LevelEditScene(scene);
+        allScenes.add(levelEditScene);
+        scene.init();
+        levelEditScene.init();
     }
 
     public void scrollScene() {

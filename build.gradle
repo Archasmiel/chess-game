@@ -1,15 +1,25 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id 'java'
 }
 
 project.ext.lwjglVersion = "3.3.3"
-project.ext.lwjglNatives = "natives-linux"
+project.ext.jomlVersion = "1.10.5"
+
+switch (OperatingSystem.current()) {
+    case OperatingSystem.LINUX:
+        project.ext.lwjglNatives = "natives-linux"
+        break
+    case OperatingSystem.WINDOWS:
+        project.ext.lwjglNatives = "natives-windows"
+        break
+}
 
 group 'net.archasmiel'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
-
 
 repositories {
     mavenCentral()
@@ -39,6 +49,7 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-par::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+    implementation "org.joml:joml:${jomlVersion}"
 }
 
 test {
