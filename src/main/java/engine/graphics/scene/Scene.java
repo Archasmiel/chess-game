@@ -1,6 +1,10 @@
-package engine.scene;
+package engine.graphics.scene;
+
+import engine.graphics.camera.Camera;
 
 public abstract class Scene {
+
+    protected Camera camera;
 
     public Scene() {
 

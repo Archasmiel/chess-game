@@ -1,14 +1,14 @@
 package window;
 
-import engine.listener.KeyListener;
-import engine.listener.MouseListener;
-import engine.scene.LevelEditScene;
-import engine.scene.LevelScene;
-import engine.scene.Scene;
-import engine.time.timer.ITimer;
-import engine.time.timer.SimpleTimer;
-import engine.time.Time;
-import engine.time.timer.Timers;
+import engine.utility.KeyListener;
+import engine.utility.MouseListener;
+import engine.graphics.scene.LevelEditScene;
+import engine.graphics.scene.LevelScene;
+import engine.graphics.scene.Scene;
+import engine.lib.timer.ITimer;
+import engine.lib.timer.SimpleTimer;
+import engine.utility.TimeMgmt;
+import engine.lib.timer.Timers;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -64,49 +64,12 @@ public class Window {
     private Window() {
 
     }
-
-    public void addNewScene() {
-        LevelScene scene = new LevelScene();
-        allScenes.add(scene);
-        LevelEditScene levelEditScene = new LevelEditScene(scene);
-        allScenes.add(levelEditScene);
-        scene.init();
-        levelEditScene.init();
-    }
-
-    public void scrollScene() {
-        if (currentScene == -1) {
-            addNewScene();
-            currentScene = 0;
-            return;
-        }
-        if (currentScene+1 >= allScenes.size()) {
-            currentScene = 0;
-            return;
-        }
-        currentScene++;
-    }
-
-    public void descrollScene() {
-        if (currentScene == -1) {
-            addNewScene();
-            currentScene = 0;
-            return;
-        }
-        if (currentScene-1 <= 0) {
-            currentScene = allScenes.size() - 1;
-            return;
-        }
-        currentScene--;
-    }
-
     public void run() {
         System.out.printf("version: %s\n", Version.getVersion());
         initialize();
         loop();
         glfwFreeCallbacks(glfwWindow);
     }
-
     public void initialize() {
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -135,40 +98,58 @@ public class Window {
 
         GL.createCapabilities();
 
-        scrollScene();
+        LevelScene scene = new LevelScene();
+        LevelEditScene levelEditScene = new LevelEditScene(scene);
+        allScenes.add(levelEditScene);
+        allScenes.add(scene);
+        currentScene = 0;
+        levelEditScene.init();
+        scene.init();
     }
 
     public void loop() {
-        float beginTime = Time.getTime(), endTime;
-        float dt = -1.0f;
         Timers timers = new Timers();
         timers.add(new SimpleTimer(0.5f));
-        timers.add(new SimpleTimer(0.5f));
+
+        float beginTime = TimeMgmt.getTime(), endTime;
+        float dt = -1.0f;
 
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
             if (dt >= 0) {
+
+                // scene switching
                 ITimer timer = timers.get(0);
                 if (timer.opened()) {
                     if (KeyListener.isKeyPressed(GLFW_KEY_Q)) {
-                        scrollScene();
+                        currentScene = currentScene == 0 ? 0 : 1;
+                        allScenes.get(currentScene).init();
                         System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
                         timer.reset();
                     }
                     if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
-                        descrollScene();
+                        currentScene = currentScene == 0 ? 1 : 0;
+                        allScenes.get(currentScene).init();
                         System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
                         timer.reset();
                     }
                 }
 
-                timer = timers.get(1);
-                if (timer.opened()) {
+                // camera moving
+                if (allScenes.get(currentScene) instanceof LevelEditScene) {
+                    LevelEditScene scene = (LevelEditScene) allScenes.get(currentScene);
                     if (KeyListener.isKeyPressed(GLFW_KEY_W)) {
-                        addNewScene();
-                        System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
-                        timer.reset();
+                        scene.moveCamera(0, dt*100.0f);
+                    }
+                    if (KeyListener.isKeyPressed(GLFW_KEY_S)) {
+                        scene.moveCamera(0, -dt*100.0f);
+                    }
+                    if (KeyListener.isKeyPressed(GLFW_KEY_A)) {
+                        scene.moveCamera(-dt*100.0f, 0);
+                    }
+                    if (KeyListener.isKeyPressed(GLFW_KEY_D)) {
+                        scene.moveCamera(dt*100.0f, 0);
                     }
                 }
 
@@ -180,7 +161,7 @@ public class Window {
             glfwSwapBuffers(glfwWindow);
             timers.tick(dt);
 
-            endTime = Time.getTime();
+            endTime = TimeMgmt.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;
         }

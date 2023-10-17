@@ -1,4 +1,4 @@
-package engine.listener;
+package engine.utility;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
@@ -12,7 +12,7 @@ public class MouseListener {
     private double yPos;
     private double lastX;
     private double lastY;
-    private boolean[] mouseBtnPressed = new boolean[3];
+    private final boolean[] mouseBtnPressed = new boolean[3];
     private boolean isDragging;
 
     private MouseListener() {

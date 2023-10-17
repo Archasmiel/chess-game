@@ -1,4 +1,4 @@
-package engine.time.timer;
+package engine.lib.timer;
 
 public class SimpleTimer implements ITimer {
 
