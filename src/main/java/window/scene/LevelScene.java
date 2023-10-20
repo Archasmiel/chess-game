@@ -1,6 +1,6 @@
-package engine.graphics.scene;
+package window.scene;
 
-public class LevelScene extends Scene{
+public class LevelScene extends Scene {
     public LevelScene() {
     }
 

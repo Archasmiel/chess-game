@@ -2,12 +2,12 @@ package window;
 
 import engine.utility.KeyListener;
 import engine.utility.MouseListener;
-import engine.graphics.scene.LevelEditScene;
-import engine.graphics.scene.LevelScene;
-import engine.graphics.scene.Scene;
+import window.scene.LevelEditorScene;
+import window.scene.LevelScene;
+import window.scene.Scene;
 import engine.lib.timer.ITimer;
 import engine.lib.timer.SimpleTimer;
-import engine.utility.TimeMgmt;
+import engine.utility.GameTime;
 import engine.lib.timer.Timers;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -58,18 +58,50 @@ public class Window {
     private int height;
     private String title;
     private Long glfwWindow;
-    private int currentScene = -1;
-    private final List<Scene> allScenes = new ArrayList<>();
+    private static Scene currentScene;
+    public static Window window = null;
 
     private Window() {
 
     }
+
+    public static Window get() {
+        if (Window.window == null) {
+            Window.window = new Window();
+        }
+
+        return Window.window;
+    }
+
+    public static Scene getScene() {
+        return get().currentScene;
+    }
+
     public void run() {
         System.out.printf("version: %s\n", Version.getVersion());
         initialize();
         loop();
         glfwFreeCallbacks(glfwWindow);
     }
+
+    public static void changeScene(int newScene) {
+        switch (newScene) {
+            case 0:
+                currentScene = new LevelEditorScene();
+                currentScene.init();
+                currentScene.start();
+                break;
+            case 1:
+                currentScene = new LevelScene();
+                currentScene.init();
+                currentScene.start();
+                break;
+            default:
+                assert false : "Unknown scene '" + newScene + "'";
+                break;
+        }
+    }
+
     public void initialize() {
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -79,7 +111,7 @@ public class Window {
 
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
 
         glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
@@ -93,78 +125,75 @@ public class Window {
         glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
 
         glfwMakeContextCurrent(glfwWindow);
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
         glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
 
-        LevelScene scene = new LevelScene();
-        LevelEditScene levelEditScene = new LevelEditScene(scene);
-        allScenes.add(levelEditScene);
-        allScenes.add(scene);
-        currentScene = 0;
-        levelEditScene.init();
-        scene.init();
+        Window.changeScene(0);
     }
 
     public void loop() {
         Timers timers = new Timers();
         timers.add(new SimpleTimer(0.5f));
 
-        float beginTime = TimeMgmt.getTime(), endTime;
+        float beginTime = GameTime.getTime(), endTime;
         float dt = -1.0f;
 
         while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
+            glClearColor(1f, 1f, 1f, 1f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
             if (dt >= 0) {
-
-                // scene switching
-                ITimer timer = timers.get(0);
-                if (timer.opened()) {
-                    if (KeyListener.isKeyPressed(GLFW_KEY_Q)) {
-                        currentScene = currentScene == 0 ? 0 : 1;
-                        allScenes.get(currentScene).init();
-                        System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
-                        timer.reset();
-                    }
-                    if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
-                        currentScene = currentScene == 0 ? 1 : 0;
-                        allScenes.get(currentScene).init();
-                        System.out.printf("scene %s/%s\n", currentScene, allScenes.size());
-                        timer.reset();
-                    }
-                }
-
-                // camera moving
-                if (allScenes.get(currentScene) instanceof LevelEditScene) {
-                    LevelEditScene scene = (LevelEditScene) allScenes.get(currentScene);
-                    if (KeyListener.isKeyPressed(GLFW_KEY_W)) {
-                        scene.moveCamera(0, dt*100.0f);
-                    }
-                    if (KeyListener.isKeyPressed(GLFW_KEY_S)) {
-                        scene.moveCamera(0, -dt*100.0f);
-                    }
-                    if (KeyListener.isKeyPressed(GLFW_KEY_A)) {
-                        scene.moveCamera(-dt*100.0f, 0);
-                    }
-                    if (KeyListener.isKeyPressed(GLFW_KEY_D)) {
-                        scene.moveCamera(dt*100.0f, 0);
-                    }
-                }
-
-                glClearColor(1f, 1f, 1f, 1f);
-                glClear(GL_COLOR_BUFFER_BIT);
-                allScenes.get(currentScene).update(dt);
+                changeScene(timers.get(0));
+                moveCamera(dt);
+                screenDraw(dt);
             }
 
             glfwSwapBuffers(glfwWindow);
             timers.tick(dt);
 
-            endTime = TimeMgmt.getTime();
+            endTime = GameTime.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;
         }
+    }
+
+    private void changeScene(ITimer timer) {
+        if (timer.opened()) {
+            if (KeyListener.isKeyPressed(GLFW_KEY_Q)) {
+                Window.changeScene(0);
+                timer.reset();
+            }
+            if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
+                Window.changeScene(1);
+                timer.reset();
+            }
+        }
+    }
+
+    private void moveCamera(float dt) {
+        if (currentScene instanceof LevelEditorScene) {
+            LevelEditorScene scene = (LevelEditorScene) currentScene;
+            if (KeyListener.isKeyPressed(GLFW_KEY_W)) {
+                scene.moveCamera(0, dt*100.0f);
+            }
+            if (KeyListener.isKeyPressed(GLFW_KEY_S)) {
+                scene.moveCamera(0, -dt*100.0f);
+            }
+            if (KeyListener.isKeyPressed(GLFW_KEY_A)) {
+                scene.moveCamera(-dt*100.0f, 0);
+            }
+            if (KeyListener.isKeyPressed(GLFW_KEY_D)) {
+                scene.moveCamera(dt*100.0f, 0);
+            }
+        }
+    }
+
+    private void screenDraw(float dt) {
+        currentScene.update(dt);
     }
 
 }
