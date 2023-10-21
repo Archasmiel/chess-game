@@ -72,4 +72,7 @@ public class GameObject {
         return transform;
     }
 
+    public String getName() {
+        return name;
+    }
 }

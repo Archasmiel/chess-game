@@ -125,7 +125,7 @@ public class Window {
         glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
 
         glfwMakeContextCurrent(glfwWindow);
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
@@ -137,7 +137,7 @@ public class Window {
         Timers timers = new Timers();
         timers.add(new SimpleTimer(0.5f));
 
-        float beginTime = GameTime.getTime(), endTime;
+        float beginTime = (float) glfwGetTime(), endTime;
         float dt = -1.0f;
 
         while (!glfwWindowShouldClose(glfwWindow)) {
@@ -155,7 +155,7 @@ public class Window {
             glfwSwapBuffers(glfwWindow);
             timers.tick(dt);
 
-            endTime = GameTime.getTime();
+            endTime = (float) glfwGetTime();
             dt = endTime - beginTime;
             beginTime = endTime;
         }

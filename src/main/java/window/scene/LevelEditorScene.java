@@ -1,5 +1,6 @@
 package window.scene;
 
+import engine.asset.AssetPool;
 import engine.graphics.camera.Camera;
 import engine.objects.GameObject;
 import engine.graphics.render.Transform;
@@ -17,30 +18,28 @@ public class LevelEditorScene extends Scene {
     public void init() {
         this.camera = new Camera(new Vector2f(0, 0));
 
-        float xOffset = 10;
-        float yOffset = 10;
+        GameObject go1 = new GameObject("Object 1", new Transform(
+                new Vector2f(100, 100), new Vector2f(256, 256)
+        ));
+        go1.addComponent(new SpriteRenderer(AssetPool.getTexture("assets/textures/test.jpg")));
+        this.addGameObjectToScene(go1);
 
-        float totalWidth = 600 - xOffset * 2;
-        float totalHeight = 300 - yOffset * 2;
-        float sizeX = totalWidth / 100.0f;
-        float sizeY = totalHeight / 100.0f;
-        float padding = 1;
+        GameObject go2 = new GameObject("Object 2", new Transform(
+                new Vector2f(400, 100), new Vector2f(256, 256)
+        ));
+        go2.addComponent(new SpriteRenderer(AssetPool.getTexture("assets/textures/testImage.jpg")));
+        this.addGameObjectToScene(go2);
 
-        for (int x=0; x < 100; x++) {
-            for (int y=0; y < 100; y++) {
-                float xPos = xOffset + (x * sizeX) + (padding * x);
-                float yPos = yOffset + (y * sizeY) + (padding * y);
+        loadResources();
+    }
 
-                GameObject go = new GameObject("Obj" + x + "" + y, new Transform(new Vector2f(xPos, yPos), new Vector2f(sizeX, sizeY)));
-                go.addComponent(new SpriteRenderer(new Vector4f(xPos / totalWidth, yPos / totalHeight, 1, 1)));
-                this.addGameObjectToScene(go);
-            }
-        }
+    private void loadResources() {
+        AssetPool.getShader("assets/shaders/default.glsl");
     }
 
     @Override
     public void update(float dt) {
-        System.out.println("FPS: " + (1.0f / dt));
+        // System.out.println("FPS: " + (1.0f / dt));
 
         for (GameObject go : this.gameObjects) {
             go.update(dt);

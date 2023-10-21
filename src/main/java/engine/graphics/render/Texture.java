@@ -2,6 +2,7 @@ package engine.graphics.render;
 
 import org.lwjgl.BufferUtils;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -15,6 +16,10 @@ public class Texture {
 
     public Texture(String filepath) {
         this.filepath = filepath;
+
+        if (!new File(filepath).exists()) {
+            throw new IllegalStateException("Couldn't load texture '" + filepath + "'");
+        }
 
         texID = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texID);
@@ -45,9 +50,6 @@ public class Texture {
             assert false : "Error: Couldn't load image '" + filepath + "'";
         }
 
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        stbi_set_flip_vertically_on_load(false);
         stbi_image_free(image);
     }
 
