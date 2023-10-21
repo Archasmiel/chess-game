@@ -1,12 +1,11 @@
 package window.scene;
 
-import engine.asset.AssetPool;
+import engine.utility.AssetPool;
 import engine.graphics.camera.Camera;
 import engine.objects.GameObject;
 import engine.graphics.render.Transform;
 import engine.objects.components.SpriteRenderer;
 import org.joml.Vector2f;
-import org.joml.Vector4f;
 
 public class LevelEditorScene extends Scene {
 

@@ -1,6 +1,6 @@
 package engine.graphics.render;
 
-import engine.asset.AssetPool;
+import engine.utility.AssetPool;
 import engine.objects.components.SpriteRenderer;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -27,16 +27,16 @@ public class RenderBatch {
     private final int VERTEX_SIZE = POS_SIZE + COLOR_SIZE + TEX_COORDS_SIZE + TEX_ID_SIZE;
     private final int VERTEX_SIZE_BYTES = VERTEX_SIZE * Float.BYTES;
 
-    private SpriteRenderer[] sprites;
+    private final SpriteRenderer[] sprites;
     private int numSprites;
     private boolean hasRoom;
-    private float[] vertices;
-    private int[] texSlots = {0, 1, 2, 3, 4, 5, 6, 7};
+    private final float[] vertices;
+    private final int[] texSlots = {0, 1, 2, 3, 4, 5, 6, 7};
 
-    private List<Texture> textures;
+    private final List<Texture> textures;
     private int vaoID, vboID;
-    private int maxBatchSize;
-    private Shader shader;
+    private final int maxBatchSize;
+    private final Shader shader;
 
     public RenderBatch(int maxBatchSize) {
         shader = AssetPool.getShader("assets/shaders/default.glsl");
@@ -59,7 +59,7 @@ public class RenderBatch {
         // Allocate space for vertices
         vboID = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (long) vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
 
         // Create and upload indices buffer
         int eboID = glGenBuffers();
@@ -199,9 +199,9 @@ public class RenderBatch {
 
         elements[offsetArrayIndex] = offset + 3;
         elements[offsetArrayIndex + 1] = offset + 2;
-        elements[offsetArrayIndex + 2] = offset + 0;
+        elements[offsetArrayIndex + 2] = offset;
 
-        elements[offsetArrayIndex + 3] = offset + 0;
+        elements[offsetArrayIndex + 3] = offset;
         elements[offsetArrayIndex + 4] = offset + 2;
         elements[offsetArrayIndex + 5] = offset + 1;
     }

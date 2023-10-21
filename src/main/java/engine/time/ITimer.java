@@ -1,4 +1,4 @@
-package engine.lib.timer;
+package engine.time;
 
 public interface ITimer {
 

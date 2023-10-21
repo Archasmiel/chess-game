@@ -5,16 +5,12 @@ import engine.utility.MouseListener;
 import window.scene.LevelEditorScene;
 import window.scene.LevelScene;
 import window.scene.Scene;
-import engine.lib.timer.ITimer;
-import engine.lib.timer.SimpleTimer;
-import engine.utility.GameTime;
-import engine.lib.timer.Timers;
+import engine.time.ITimer;
+import engine.time.SimpleTimer;
+import engine.time.Timers;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;

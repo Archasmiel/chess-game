@@ -7,8 +7,8 @@ import java.util.List;
 
 public class GameObject {
 
-    private String name;
-    private List<Component> components;
+    private final String name;
+    private final List<Component> components;
     protected Transform transform;
 
     public GameObject(String name) {

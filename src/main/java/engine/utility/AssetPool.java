@@ -1,4 +1,4 @@
-package engine.asset;
+package engine.utility;
 
 import engine.graphics.render.Shader;
 import engine.graphics.render.Texture;
