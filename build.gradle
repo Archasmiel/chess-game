@@ -17,7 +17,7 @@ switch (OperatingSystem.current()) {
 }
 
 group 'net.archasmiel'
-version '0.1.1a'
+version '0.1.2a'
 
 sourceCompatibility = 1.8
 
